@@ -34,10 +34,10 @@
             box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
         }
         th { background-color: #f2f2f2; }
-        .match { background-color: #d4edda; }
-        .mismatch { background-color: #f8d7da; }
-        .missing { background-color: #fff3cd; }
-        .error { background-color: #f17f8a; }
+        .match { background-color: #a3f3b6; }
+        .mismatch { background-color: #f0babe; }
+        .missing { background-color: #ae84f1; }
+        .error { background-color: #c44a56; }
     </style>
     
 </head>
@@ -63,8 +63,8 @@
                 <input type="radio" id="btn2" name="selected" value="2">
                 <label for="btn2">Span</label>
 
-                <input type="radio" id="btn3" name="selected" value="3" disabled>
-                <label for="btn3">3</label>
+                <input type="radio" id="btn3" name="selected" value="3">
+                <label for="btn3">RFID Seq</label>
 
                 <input type="radio" id="btn4" name="selected" value="4" disabled>
                 <label for="btn4">4</label>
@@ -84,32 +84,28 @@
         {% endif %}
 
         {% if result_data %}
-            <h2 class="text-2xl font-semibold text-gray-800 mt-8 mb-4 text-center">Comparison Result</h2>
-            <div class="overflow-x-auto bg-white rounded-lg shadow-lg">
-                <table class="min-w-full table-auto border-collapse">
-                    <thead>
-                        <tr class="bg-gray-100 text-gray-700">
-                            <th class="px-4 py-3 text-left">S.No</th>
-                            <th class="px-4 py-3 text-left">TOC_TP Value</th>
-                            <th class="px-4 py-3 text-left">Line No.</th>
-                            <th class="px-4 py-3 text-left">CONFIG Value</th>
-                            <th class="px-4 py-3 text-left">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for row in result_data %}
-                            <tr class="hover:bg-gray-50 {{ row.Status | lower | replace(' ', '-') }}">
-                                <td class="px-4 py-2 border-b">{{ row['S.No'] }}</td>
-                                <td class="px-4 py-2 border-b">{{ row['CSV1_Value'] }}</td>
-                                <td class="px-4 py-2 border-b">{{ row['Index'] }}</td>
-                                <td class="px-4 py-2 border-b">{{ row['CSV2_Value'] }}</td>
-                                <td class="px-4 py-2 border-b">{{ row['Status'] }}</td>
-                            </tr>
+        <h2 class="text-2xl font-semibold text-gray-800 mt-8 mb-4 text-center">Comparison Result</h2>
+        <div class="overflow-x-auto bg-white rounded-lg shadow-lg">
+            <table class="min-w-full table-auto border-collapse">
+                <thead>
+                    <tr class="bg-gray-100 text-gray-700">
+                        {% for key in result_data[0].keys() %}
+                            <th class="px-4 py-3 text-left">{{ key.replace('_', ' ') }}</th>
                         {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in result_data %}
+                        <tr class="hover:bg-gray-50 {{ row['Status'] | lower | replace(' ', '-') }}">
+                            {% for value in row.values() %}
+                                <td class="px-4 py-2 border-b">{{ value }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
     </div>
 
 </body>
