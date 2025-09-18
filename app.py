@@ -64,6 +64,7 @@ def load_csv2_1(file,pattern):
         
         match = pattern.search(row[0])
         if match:
+            print('matched')
             sno = int(match.group(1)) + 1
             try:
                 value = float(row[3].strip())
@@ -73,6 +74,7 @@ def load_csv2_1(file,pattern):
                     mapping[sno] = (idx + 1, value)
             except ValueError:
                 pass
+    print(mapping)
     return mapping
 
 
@@ -191,6 +193,34 @@ def compare_data(csv1_data, csv2_data, column_index):
     return results
 
 
+def compare_data_3(csv1_data, csv2_data_1,csv2_data_2,column_index):
+    results = []
+    for row in csv1_data:
+        try:
+            sno = int(row[0])  # Get S.No from the first column
+            csv1_val = float(row[column_index].strip()) if row[column_index].strip() else 0.0
+            index_1, csv2_val_1 = csv2_data_1.get(sno, (None, None))
+            index_2, csv2_val_2 = csv2_data_2.get(sno, (None, None))
+            match_status = 'Match' if (csv2_val_1 == csv1_val) and  (csv2_val_1 == csv2_val_2) else 'Mismatch'
+            results.append({
+                'S.No': sno,
+                'CSV1_Value': csv1_val,
+                'Index_1': index_1,
+                'CSV2_Value_1': csv2_val_1 if csv2_val_1 is not None else 'Not Found',
+                'Index_2':index_2,
+                'CSV2_Value_2': csv2_val_2 if csv2_val_2 is not None else 'Not Found',
+                'Status': match_status if csv2_val_1 is not None else 'Missing in CSV2'
+            })
+        except (ValueError, KeyError, IndexError):  # Handle missing or incorrect data
+            results.append({
+                'S.No': row[0] if len(row) > 0 else 'Unknown',  # Assuming 'S.No' is in the first column
+                'CSV1_Value': row[column_index] if len(row) > column_index else 'Invalid',  # Handle invalid data
+                'CSV2_Value': 'Error',
+                'Status': 'Error'
+            })
+    return results
+
+
 # def compare_data(csv1_data, csv2_data, column_index):
 #     results = []
 #     for row in csv1_data:
@@ -234,6 +264,12 @@ def index():
 
                     csv2_data = load_csv2_2(csv2_file,pattern)
                     result_data = compare_data_2(csv1_data, csv2_data,column_index)
+                elif (selected_value=="2"):
+                    Span_pattern=re.compile(r'appConfig.aggrProfConfiguration.trackProf\[(\d+)U\]\.profSpan')
+                    csv2_data_1 = load_csv2_1(csv2_file,pattern)
+                    csv2_file.seek(0)
+                    csv2_data_2 = load_csv2_1(csv2_file,Span_pattern)
+                    result_data = compare_data_3(csv1_data, csv2_data_1,csv2_data_2,column_index)
                 else:
 
                     csv2_data = load_csv2_1(csv2_file,pattern)
